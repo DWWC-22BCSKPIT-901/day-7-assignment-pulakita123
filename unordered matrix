@@ -1,0 +1,76 @@
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <unordered_set>
+#include <algorithm>
+using namespace std;
+
+class UnionFind {
+public:
+    unordered_map<string, string> parent;
+
+    string find(string email) {
+        if (parent[email] != email) {
+            parent[email] = find(parent[email]);
+        }
+        return parent[email];
+    }
+
+    void unite(string email1, string email2) {
+        string root1 = find(email1);
+        string root2 = find(email2);
+        if (root1 != root2) {
+            parent[root2] = root1;
+        }
+    }
+};
+
+vector<vector<string>> accountsMerge(vector<vector<string>>& accounts) {
+    UnionFind uf;
+    unordered_map<string, string> emailToName;
+    for (auto& account : accounts) {
+        string name = account[0];
+        for (int i = 1; i < account.size(); i++) {
+            string email = account[i];
+            emailToName[email] = name;
+            if (uf.parent.find(email) == uf.parent.end()) {
+                uf.parent[email] = email;
+            }
+            if (i > 1) {
+                uf.unite(account[i - 1], email);
+            }
+        }
+    }
+    unordered_map<string, vector<string>> groups;
+    for (auto& [email, _] : emailToName) {
+        string root = uf.find(email);
+        groups[root].push_back(email);
+    }
+    vector<vector<string>> result;
+    for (auto& [root, emails] : groups) {
+        sort(emails.begin(), emails.end());
+        emails.insert(emails.begin(), emailToName[root]);
+        result.push_back(emails);
+    }
+
+    return result;
+}
+
+int main() {   
+    vector<vector<string>> accounts = {
+        {"John", "johnsmith@mail.com", "john_newyork@mail.com"},
+        {"John", "johnsmith@mail.com", "john00@mail.com"},
+        {"Mary", "mary@mail.com"},
+        {"John", "johnnybravo@mail.com"}
+    };
+
+    vector<vector<string>> mergedAccounts = accountsMerge(accounts);
+    for (auto& account : mergedAccounts) {
+        for (auto& item : account) {
+            cout << item << " ";
+        }
+        cout << endl;
+    }
+
+    return 0;
+}
