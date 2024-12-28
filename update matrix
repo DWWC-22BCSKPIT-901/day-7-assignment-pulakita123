@@ -1,0 +1,57 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <climits>
+using namespace std;
+
+vector<vector<int>> updateMatrix(vector<vector<int>>& mat) {
+    int m = mat.size();
+    int n = mat[0].size();
+
+    vector<vector<int>> result(m, vector<int>(n, INT_MAX));
+    queue<pair<int, int>> q;
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            if (mat[i][j] == 0) {
+                result[i][j] = 0;
+                q.push({i, j});
+            }
+        }
+    }
+    vector<pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+    while (!q.empty()) {
+        auto [x, y] = q.front();
+        q.pop();
+
+        for (auto [dx, dy] : directions) {
+            int newX = x + dx;
+            int newY = y + dy;
+            if (newX >= 0 && newX < m && newY >= 0 && newY < n) {
+                if (result[newX][newY] > result[x][y] + 1) {
+                    result[newX][newY] = result[x][y] + 1;
+                    q.push({newX, newY});
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
+int main() {
+    vector<vector<int>> mat = {
+        {0, 0, 0},
+        {0, 1, 0},
+        {1, 1, 1}
+    };
+
+    vector<vector<int>> result = updateMatrix(mat);
+    for (auto row : result) {
+        for (auto cell : row) {
+            cout << cell << " ";
+        }
+        cout << endl;
+    }
+
+    return 0;
+}
