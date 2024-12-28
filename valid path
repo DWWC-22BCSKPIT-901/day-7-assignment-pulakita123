@@ -1,0 +1,40 @@
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <unordered_set>
+using namespace std;
+
+bool dfs(int node, int destination, unordered_map<int, vector<int>>& graph, unordered_set<int>& visited) {
+    if (node == destination) return true;
+    visited.insert(node);
+
+    for (int neighbor : graph[node]) {
+        if (!visited.count(neighbor)) {
+            if (dfs(neighbor, destination, graph, visited)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool validPath(int n, vector<vector<int>>& edges, int source, int destination) {
+    if (source == destination) return true;
+    unordered_map<int, vector<int>> graph;
+    for (auto& edge : edges) {
+        graph[edge[0]].push_back(edge[1]);
+        graph[edge[1]].push_back(edge[0]);
+    }
+    unordered_set<int> visited;
+    return dfs(source, destination, graph, visited);
+}
+
+int main() {
+    int n = 6;
+    vector<vector<int>> edges = {{0, 1}, {0, 2}, {3, 5}, {5, 4}, {4, 3}};
+    int source = 0;
+    int destination = 5;
+    cout << (validPath(n, edges, source, destination) ? "True" : "False") << endl;
+
+    return 0;
+}
